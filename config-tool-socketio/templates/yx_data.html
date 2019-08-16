@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.treeview.css')}}">
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='xlsx.core.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery.treeview.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='socket.io.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='yxexcel.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='yx_data.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='linkexcel.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='link_data.js')}}"></script>
+</head>
+<body>
+<div id="header">
+    <span style="font-size:42px">点表配置工具</span>
+    <span style="float:right;margin-right:40px;" id="time"><span></span>年<span></span>月<span></span>日<span></span>时<span></span>分<span></span>秒</span>
+</div>
+
+<div id="nav">
+   <ul id="browser" class="filetree treeview-famfamfam">
+		<li id="station"><span class="folder" onclick="show_link_table()">厂站列表</span>
+            {% for i in range(stationLen) %}
+			    <ul>
+				<li class="closed"><span class="folder" id="station">{{ station[i][1] }}</span>
+					<ul>
+						<li><span class="file" onclick="show_yx_table()">遥信</span></li>
+					</ul>
+					<ul>
+						<li><span class="file">遥测</span></li>
+					</ul>
+					<ul>
+						<li><span class="file">遥控</span></li>
+					</ul>
+					<ul>
+						<li><span class="file">遥调</span></li>
+					</ul>
+					<ul>
+						<li><span class="file">事件</span></li>
+					</ul>
+				</li>
+                </ul>
+            {% endfor %}
+		</li>
+	</ul>
+    {#<button type="button" onClick="re_station();">刷新</button>#}
+</div>
+
+<div id="section">
+    <div class="row" id="yx_table" style="display: none;">
+    <fieldset>
+        <legend>遥信数据</legend>
+        <span class="mt-sm">
+        <input type="file" id="yxfile" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+        <a href="javascript:selectYxFile()">加载本地excel文件</a>
+        </span>
+        <input type="button" onclick="insert_yx_data();" value="保存"/>
+        <button type="button" onClick="show_db_yx_data();">显示</button>
+        <button type="button" onClick="update_db_yx_data();">更新</button>
+        <button type="button" onClick="delete_yx_data();">删除</button>
+        <input type="button" onclick="exportExcel_yx();" value="导出Excel"/>
+        <div id="yxresult" contenteditable>
+            <table id="yxTable" style="background-color:#eeeeee;" bordercolor="#aaaaaa" border="1" cellpadding="0" cellpadding="2" width="100%">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" class="i-checks" id="selectAllYx"/></th>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th>DESCRIBE</th>
+                    <th>ASDU</th>
+                    <th>WORD</th>
+                    <th>BYTE</th>
+                    <th>NUMBYTE</th>
+                    <th>ADDRESS</th>
+                </tr>
+                </thead>
+                <tbody id="tBody_yx">
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+    <input type="button" onClick="addYxRow();" style="font-size:16px;" value="+"/>
+{#    <input type="button" onClick="insert_yx_data();" style="font-size:16px;" value="添加"/>#}
+    <input type="button" onClick="deleteYxRow();" style="font-size:16px;" value="-"/>
+</div>
+
+    <div class="row" id="link_table" style="display: none;">
+    <fieldset>
+        <legend>厂站数据</legend>
+        <span class="mt-sm">
+        <input type="file" id="linkfile" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+        <a href="javascript:selectLinkFile()">加载本地excel文件</a>
+        </span>
+        <input type="button" onclick="insert_link_data();" value="保存"/>
+        <button type="button" onClick="show_db_station_data();">显示</button>
+        <button type="button" onClick="update_db_station_data();">更新</button>
+        <button type="button" onClick="delete_station_data();">删除</button>
+        <input type="button" onclick="exportExcel_link();" value="导出Excel"/>
+        <div id="linkresult" contenteditable>
+            <table id="linkTable" style="background-color:#eeeeee;" bordercolor="#aaaaaa" border="1" cellpadding="0" cellpadding="2" width="100%">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" class="i-checks" id="selectAllStation"/></th>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th>DESCRIBE</th>
+                    <th>RULEID</th>
+                    <th>ADDRESS</th>
+                    <th>PORT</th>
+                    <th>ROLE</th>
+                </tr>
+                </thead>
+                <tbody id="tBody_link">
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+    <input type="button" onClick="addStationRow();" style="font-size:16px;" value="+"/>
+    <input type="button" onClick="deleteStationRow();" style="font-size:16px;" value="-"/>
+</div>
+</div>
+
+<div id="footer">
+    @2019  西安端怡科技有限公司
+    <span style="float:right;margin-right: 40px;" id="about">关于产品</span>
+    <span style="float:right;margin-right: 20px;" id="contect">联系我们</span>
+</div>
+</body>
+</html>
